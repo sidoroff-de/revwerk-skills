@@ -1,0 +1,19 @@
+{
+  "name": "revwerk-skills",
+  "interface": {
+    "displayName": "RevWerk Skills"
+  },
+  "plugins": [
+    {
+      "name": "context-foundation",
+      "source": {
+        "source": "local",
+        "path": "./plugins/context-foundation"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

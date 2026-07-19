@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "revwerk-skills",
+  "description": "RevWerk's Context Foundation Client Skills, installable via Claude Code's plugin/marketplace flow.",
+  "owner": {
+    "name": "RevWerk"
+  },
+  "plugins": [
+    {
+      "name": "context-foundation",
+      "description": "Context Foundation Client Skills: guided intake, direct item/focus changes, passive context grounding, and cf:// reference resolution — thin clients of a RevWerk-hosted Context Foundation MCP server.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

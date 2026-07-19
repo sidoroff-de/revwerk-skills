@@ -1,0 +1,8 @@
+{
+  "name": "context-foundation",
+  "description": "Context Foundation Client Skills: guided intake, direct item/focus changes, passive context grounding, and cf:// reference resolution — thin clients of a RevWerk-hosted Context Foundation MCP server.",
+  "version": "0.6.1",
+  "author": {
+    "name": "RevWerk"
+  }
+}
