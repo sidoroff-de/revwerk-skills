@@ -8,8 +8,10 @@ description: >
   retention and churn, expansion/upsell, cross-team handoffs and SLAs, and operating rules/policies
   (discounting, routing, escalation). Fires passively on topic match: when the user discusses, drafts,
   analyzes, or asks about anything in these areas, this skill checks the Foundation's registry and grounds
-  the response in the company's own published context. Not invoked by an explicit command — it is background
-  grounding, not a user-facing operation.
+  the response in the company's own published context. Also fires, separately, whenever the conversation asks
+  a factual or quantitative business question that warehouse data could answer — counts, rates, trends,
+  "how many", "what's our X this quarter" — by surfacing relevant DWH blueprints instead of Context Items. Not
+  invoked by an explicit command — it is background grounding, not a user-facing operation.
 ---
 
 # Context Foundation Inject — client
@@ -19,6 +21,7 @@ This skill grounds ordinary marketing/sales/ops/delivery conversation in the Fou
 ## Prerequisites
 
 - The **CF MCP** is connected (tools: `cf_registry_get`, `cf_item_get`). Any valid key role works — this skill never writes Foundation data, and writes nothing to disk.
+- The same two tools serve DWH blueprints — `cf_registry_get(kind="dwh")` browses them, `cf_item_get(slug)` fetches one by slug. No separate tool exists for DWH; only the `kind` argument differs (see "DWH blueprints" below).
 
 ## Registry → item lookup
 
@@ -40,13 +43,30 @@ Full bodies come only from `cf_item_get(slug)` (`body_markdown` in the response)
 5. **Acknowledge, then use.** Before folding the content into the response, always show a one-line visible acknowledgment naming what was pulled in — e.g. *"Using your Foundation's ICP + Value Prop context here."* Never inject silently.
 6. **Nothing relevant → do nothing.** If no not-yet-surfaced registry entry is judged relevant, fetch nothing, inject nothing, and show **no acknowledgment** — an empty pull is silent, and the response proceeds without Foundation content.
 
-## Scope: Context Items only
+## Scope: Context Items only (this loop)
 
 Judge relevance over `cf_registry_get()` and fetch only via `cf_item_get(slug)` for a registry-listed slug. Do **not** call `cf_item_get('goal')`, `cf_focus_list()`, or `cf_item_get('business-context')` as part of this skill — those are always-relevant background, a different concern from topic-triggered pulls, and other flows own them.
 
+DWH blueprints are a separate, additive loop with their own trigger and their own registry call — see below. Nothing in this section changes when that loop also fires.
+
+## DWH blueprints (analytics/factual-data trigger)
+
+A **second, independent trigger** alongside the topic-area one above: when the conversation asks a **factual or quantitative business question** — one a warehouse dataset could actually answer (counts, rates, trends, "how many", "what's our X this quarter", cohort/segment breakdowns) — rather than a marketing/sales/ops/delivery topic in the abstract. The two triggers are not mutually exclusive; either, both, or neither can fire on a given turn, and each runs its own loop independently.
+
+On this trigger, browse and surface **DWH blueprints** (data-availability specs for AI query planning over a warehouse dataset — `docs/adr/0010-dwh-blueprints-as-context-items-kind.md`) using the same read-only discipline as the Item loop above, just against the `kind="dwh"` registry instead:
+
+1. **Browse.** Call **`cf_registry_get(kind="dwh")`** — same index shape as the default registry (`slug`, `title`, `summary`, `triggers`, `published_at`), scoped to blueprints only.
+2. **Judge relevance yourself**, from title/summary/triggers alone, before fetching any body — same discipline as step 2 of the Item loop. Relevant = this blueprint's data-availability facts would materially inform the factual/quantitative answer being written.
+3. **Drop already-surfaced blueprints.** Track fetched-and-announced DWH slugs the same way as Item slugs (conversation memory only) and exclude them from re-fetch.
+4. **Fetch at most 5.** Read the full body of up to **5** of the most relevant remaining blueprints via **`cf_item_get(slug)`** — the same 5-per-trigger cap as the Item loop, tracked separately from it (a DWH fetch never counts against the Item cap or vice versa).
+5. **Acknowledge, then use.** Before folding blueprint content into the response, show a one-line visible acknowledgment — e.g. *"Using your Foundation's DWH blueprint for order volume here."* Never inject silently.
+6. **Nothing relevant → do nothing.** No not-yet-surfaced blueprint judged relevant means fetch nothing, inject nothing, show no acknowledgment.
+
+This is additive only: it never changes what the topic-triggered Item loop does, and a conversation with no factual/quantitative question never calls `cf_registry_get(kind="dwh")` at all.
+
 ## Errors
 
-This skill must never degrade the conversation it fires inside:
+This skill must never degrade the conversation it fires inside — for either loop, Context Items or DWH blueprints:
 
 - **Connection / timeout** → retry the read once; if it persists, skip injection for this trigger and answer normally, with a one-line note that Foundation context couldn't be reached.
 - **License / quota / expiry** → skip injection, note it in one line, and continue; don't turn a background grounding step into a blocking error.

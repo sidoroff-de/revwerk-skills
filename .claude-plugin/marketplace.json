@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "revwerk",
   "description": "RevWerk's Context Foundation Client Skills, installable via Claude Code's plugin/marketplace flow.",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "owner": {
     "name": "RevWerk"
   },
