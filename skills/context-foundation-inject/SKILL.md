@@ -1,17 +1,13 @@
 ---
 name: context-foundation-inject
 description: >
-  Automatically pull relevant Context Foundation items into the conversation whenever marketing, sales,
-  delivery, or RevOps topics come up — ICPs, personas, competitors, value proposition, brand story,
-  positioning, pricing and packaging, sales motion, pipeline, channels, attribution, revenue metrics,
-  CRM/tooling, campaigns, outreach, forecasting, lead handling, onboarding/activation, service delivery,
-  retention and churn, expansion/upsell, cross-team handoffs and SLAs, and operating rules/policies
-  (discounting, routing, escalation). Fires passively on topic match: when the user discusses, drafts,
-  analyzes, or asks about anything in these areas, this skill checks the Foundation's registry and grounds
-  the response in the company's own published context. Also fires, separately, whenever the conversation asks
-  a factual or quantitative business question that warehouse data could answer — counts, rates, trends,
-  "how many", "what's our X this quarter" — by surfacing relevant DWH blueprints instead of Context Items. Not
-  invoked by an explicit command — it is background grounding, not a user-facing operation.
+  Grounds marketing, sales, delivery, and RevOps conversation in the company's own published Context
+  Items — ICP, personas, competitors, value prop, positioning, pricing, sales motion, pipeline, channels,
+  attribution, metrics, campaigns, forecasting, onboarding, retention, expansion, handoffs/SLAs, and
+  operating rules (discounting, routing, escalation). Fires passively on topic match whenever the user
+  discusses, drafts, analyzes, or asks about these areas. Separately, surfaces DWH blueprints instead when
+  the question is factual or quantitative — counts, rates, trends, "how many", "what's our X this quarter".
+  Background grounding, never invoked by explicit command.
 ---
 
 # Context Foundation Inject — client
