@@ -29,6 +29,7 @@ plugins/
 .agents/
   plugins/
     marketplace.json   # Codex marketplace manifest (lists the plugin(s) in this repo)
+.mcp.json              # the plugin's bundled MCP connector (URL only, no credentials)
 VERSION                # canonical version stamp for this publish, mirrors plugin.json
 ```
 
@@ -45,15 +46,28 @@ Via the [skills.sh](https://skills.sh) installer (recommended):
 npx skills@latest add sidoroff-de/revwerk-skills
 ```
 
-Via Claude Code's plugin/marketplace flow: add this repo as a marketplace source and install the `context-foundation`
-plugin it lists (see `.claude-plugin/plugin.json` / `.claude-plugin/marketplace.json`).
-
-Via Codex's plugin/marketplace flow:
+Via the plugin/marketplace flow in Claude Code or Codex — the same two commands in both:
 
 ```
 /plugin marketplace add sidoroff-de/revwerk-skills
-/plugin install context-foundation@revwerk-skills
+/plugin install context-foundation@revwerk
 ```
+
+In Claude Cowork and claude.ai, install through the UI instead: **Customize → Plugins → Add marketplace**, enter
+`https://github.com/sidoroff-de/revwerk-skills`, then install the `context-foundation` plugin it lists.
+
+## Connecting the MCP server
+
+The plugin bundles its MCP connector (`.mcp.json`), so installing it also registers the hosted Context Foundation
+server — there is no connector to add by hand.
+
+That file carries a URL and nothing else. The server answers an unauthenticated request with a `401` and an OAuth
+challenge, so your client registers itself and walks you through a sign-in that ends on the server's own `/license`
+page. You paste your license key there, once. **The key is never stored in this repo, in the plugin, or in any
+config file** — this repo is public and every client installs the identical copy.
+
+If you need a static bearer token instead (scripts, CI, clients without OAuth support), configure the server
+manually rather than relying on the bundled connector.
 
 Manual / git:
 
@@ -67,5 +81,5 @@ ln -s ~/src/revwerk-skills/skills/* ~/.claude/skills/
 Content in `skills/`, `dist/`, `VERSION`, `.claude-plugin/plugin.json`, `plugins/context-foundation/skills/`,
 and `plugins/context-foundation/.codex-plugin/plugin.json` is generated and synced from an internal publish
 pipeline — don't hand-edit those paths; changes are made upstream and republished here.
-`.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`, and this README are maintained
-directly in this repo.
+Both marketplace manifests and `.mcp.json` are generated too. This README is the only file maintained directly
+in this repo.

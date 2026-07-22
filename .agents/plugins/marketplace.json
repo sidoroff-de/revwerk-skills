@@ -1,5 +1,6 @@
 {
-  "name": "revwerk-skills",
+  "name": "revwerk",
+  "version": "0.6.6",
   "interface": {
     "displayName": "RevWerk Skills"
   },
